@@ -17,10 +17,11 @@ CREATE TABLE users (
   uid varchar(255) NOT NULL UNIQUE,
   credits int unsigned NOT NULL,
   rfid varchar(255) NOT NULL UNIQUE,
+  tracking int NOT NULL DEFAULT 1,
   PRIMARY KEY (id)
 );
 LOCK TABLES users WRITE;
-INSERT INTO users VALUES (1,'default',100,'000000');
+INSERT INTO users VALUES (1,'default',100,'000000',1);
 UNLOCK TABLES;
 
 
