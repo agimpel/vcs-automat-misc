@@ -1,3 +1,8 @@
+# symlink for this file to systemd: sudo ln -s /home/it/vcs-automat-misc/client/automat.service /etc/systemd/system/automat.service
+# enable service: sudo systemctl enable automat.service
+# start service: sudo systemctl start automat.service
+# see logs: sudo journalctl -u automat.service
+
 [Unit]
 Description=Bierautomat-Service
 
