@@ -1,0 +1,13 @@
+[Unit]
+Description=Bierautomat-Service
+
+[Service]
+User=it
+Type=simple
+Restart=always
+RestartSec=10
+TimeoutSec=10
+ExecStart=/usr/bin/python3 /home/it/vcs-automat-core/unit_tests/tbot.py
+
+[Install]
+WantedBy=multi-user.target
