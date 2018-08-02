@@ -56,5 +56,6 @@ Memory.............: `cat /proc/meminfo | grep MemFree | awk {'print $2'}`kB (Fr
 Load Averages......: ${one}, ${five}, ${fifteen} (1, 5, 15 min)
 IP Address.........: `wget -q -O - http://icanhazip.com/ | tail`
 Running Processes..: `ps ax | wc -l | tr -d " "`
+Temperature........: `vcgencmd measure_temp | sed 's/.*=//' | sed 's/\SC//'`°C
 $(tput sgr0)
 "
