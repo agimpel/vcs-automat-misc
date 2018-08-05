@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import sys
 import time
 import configparser
 import logging
@@ -20,7 +21,6 @@ for lang in ('de_DE', 'de_DE.utf8', 'de_CH', 'de_CH.utf8'):
         pass
 
 
-import random
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s\t%(levelname)s\t[%(name)s: %(funcName)s]\t%(message)s',
