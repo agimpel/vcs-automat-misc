@@ -2,3 +2,4 @@
 hmac_secret = my_safe_hmac_secret
 mysql_user = my_mysql_user
 mysql_password = my_safe_mysql_password
+wordpress_plugin_dir = "/var/www/html/wp-content/plugins/vcs-automat-api"

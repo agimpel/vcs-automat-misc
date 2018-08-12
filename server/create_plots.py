@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 import time
 import configparser
 import logging
 import numpy as np
 from datetime import datetime, date, timedelta
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import mysql.connector
@@ -47,6 +50,11 @@ logger.info('started at '+time.strftime('%d.%m.%y, %H:%M'))
 config = configparser.SafeConfigParser()
 config.read('settings.ini')
 
+plugin_path = str(config['general']['wordpress_plugin_dir'])
+img_path = plugin_path+"/img"
+if os.path.isdir(img_path) is False:
+    logger.error('Image directory for wordpress plugin not found at '+img_path)
+    sys.exit()
 
 try:
   dbcn = mysql.connector.connect(user=str(config['general']['mysql_user']), password=str(config['general']['mysql_password']), host='localhost', database='vcs_automat')
@@ -102,6 +110,7 @@ fig.autofmt_xdate()
 plt.ylabel('relativer Konsum [%]')
 set_title(plt, 'Durchschnittlicher Konsum nach Wochentag')
 plt.savefig('img/weekday.svg', transparent=True)
+plt.savefig(img_path+'/weekday.svg', transparent=True)
 plt.close()
 
 
@@ -115,8 +124,8 @@ ax.set_xlim(0, 24)
 ax.set_xticks([1,2,4,5,7,8,10,12,14,16,17,19,20,22,23], minor=True)
 plt.xticks((0,3,6,9,12,15,18,21,24))
 plt.ylabel('relativer Konsum [%]')
-set_title(plt, 'Durschnittlicher Konsum nach Uhrzeit')
-plt.savefig('img/hour.svg', transparent=True)
+set_title(plt, 'Durchnittlicher Konsum nach Uhrzeit')
+plt.savefig(img_path+'/hour.svg', transparent=True)
 plt.close()
 
 
@@ -143,5 +152,5 @@ fig.autofmt_xdate()
 ax.set_xlim(int(mdates.date2num(datetime(YEAR, 1, 1))), int(mdates.date2num(datetime(YEAR, 12, 31))))
 plt.ylabel('Gesamtkonsum')
 set_title(plt, 'Wöchentlicher Konsum in '+str(YEAR))
-plt.savefig('img/year_'+str(YEAR)+'.svg', transparent=True)
+plt.savefig(img_path+'/year_'+str(YEAR)+'.svg', transparent=True)
 plt.close()
