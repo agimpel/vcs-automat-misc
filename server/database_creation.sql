@@ -19,9 +19,6 @@ CREATE TABLE users (
   rfid varchar(255) NOT NULL UNIQUE,
   PRIMARY KEY (id)
 );
-LOCK TABLES users WRITE;
-INSERT INTO users VALUES (1,'default',100,'000000');
-UNLOCK TABLES;
 
 
 DROP TABLE IF EXISTS nonces;

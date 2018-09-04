@@ -1,7 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import sys
+import os,sys,inspect
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+sys.path.insert(0, current_dir)
 import time
 import configparser
 import logging
@@ -27,7 +29,7 @@ logger.info('started at '+time.strftime('%d.%m.%y, %H:%M'))
 
 
 
-CHECK_TIMEDELTA = 3599 #seconds
+CHECK_TIMEDELTA = 3590 #seconds
 
 
 
@@ -72,9 +74,9 @@ try:
   dbcn = mysql.connector.connect(user=str(config['general']['mysql_user']), password=str(config['general']['mysql_password']), host='localhost', database='vcs_automat')
 except mysql.connector.Error as err:
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        print("Username or password wrong")
+        logger.error("Username or password wrong")
     elif err.errno == errorcode.ER_BAD_DB_ERROR:
-        print("Database does not exist")
+        logger.error("Database does not exist")
     else:
         print(err)
     sys.exit()
@@ -85,6 +87,18 @@ db = dbcn.cursor()
 
 next_reset = int(get_setting(dbcn, 'next_reset'))
 logger.info('Next reset is set to '+str(next_reset)+' corresponding to '+time.strftime('%d.%m.%Y, %H:%M', time.localtime(next_reset)))
+
+last_reset = int(get_setting(dbcn, 'last_reset'))
+logger.info('Last reset is set to '+str(last_reset)+' corresponding to '+time.strftime('%d.%m.%Y, %H:%M', time.localtime(last_reset)))
+
+reset_interval = int(get_setting(dbcn, 'reset_interval'))*24*3600 #convert to seconds
+logger.info('Reset interval is set to '+str(reset_interval))
+
+
+if next_reset is not last_reset + reset_interval:
+    next_reset = last_reset + reset_interval
+    logger.info('Next reset does not correspond to last reset + reset interval, updating it to '+str(next_reset)+' corresponding to '+time.strftime('%d.%m.%Y, %H:%M', time.localtime(next_reset)))
+
 
 if(int(time.time()) < next_reset - CHECK_TIMEDELTA):
     logger.info('No reset necessary. Dismissing.')
@@ -97,11 +111,9 @@ logger.info('Reset is necessary. Processing database update.')
 credits = int(get_setting(dbcn, 'standard_credits'))
 update_credits(dbcn, credits)
 
-last_reset = int(get_setting(dbcn, 'last_reset'))
-reset_interval = int(get_setting(dbcn, 'reset_interval'))*24*3600 #convert to seconds
 
 
-upcoming_reset = last_reset + reset_interval
+upcoming_reset = next_reset + reset_interval
 # current_reset = int(time.time())
 current_reset = next_reset
 
