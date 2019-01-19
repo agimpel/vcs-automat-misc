@@ -1,6 +1,7 @@
 server/img/*
 !server/img/not_found.svg
 server/settings.ini
+server/database_creation.sql
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

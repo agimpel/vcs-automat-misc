@@ -2,4 +2,6 @@
 hmac_secret = my_safe_hmac_secret
 mysql_user = my_mysql_user
 mysql_password = my_safe_mysql_password
+api_url = https://www.myapiurl.somewhere
+api_key = my_safe_api_secret
 wordpress_plugin_dir = /var/www/html/wp-content/plugins/vcs-automat-api
