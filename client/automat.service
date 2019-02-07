@@ -12,7 +12,7 @@ Type=simple
 Restart=always
 RestartSec=10
 TimeoutSec=10
-ExecStart=/usr/bin/python3 /home/it/vcs-automat-core/unit_tests/tbot.py
+ExecStart=/usr/bin/python3 /home/it/vcs-automat-core/main.py
 
 [Install]
 WantedBy=multi-user.target
