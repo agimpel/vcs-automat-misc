@@ -59,3 +59,8 @@ Running Processes..: `ps ax | wc -l | tr -d " "`
 Temperature........: `vcgencmd measure_temp | sed 's/.*=//' | sed 's/\SC//'`°C
 $(tput sgr0)
 "
+
+alias automat-stop="systemctl disable automat"
+alias automat-start ="systemctl enable automat && systemctl start automat"
+alias automat-reload="systemctl restart automat"
+alias automat-log="journalctl -f -u automat"
