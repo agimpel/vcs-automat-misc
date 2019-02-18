@@ -61,6 +61,6 @@ $(tput sgr0)
 "
 
 alias automat-stop="systemctl disable automat"
-alias automat-start ="systemctl enable automat && systemctl start automat"
+alias automat-start="systemctl enable automat && systemctl start automat"
 alias automat-reload="systemctl restart automat"
 alias automat-log="journalctl -f -u automat"
