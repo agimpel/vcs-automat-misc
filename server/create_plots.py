@@ -103,31 +103,33 @@ weeks = np.array([sum(entry.get('year') == YEAR and entry.get('week') == j for e
 #
 # BASED ON WEEKDAYS
 #
-fig, ax = plt.subplots()
-fig.set_size_inches(SIZE)
-weekdays_title = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
-ax.bar(weekdays_title, weekdays/sum(weekdays)*100, color=COLOR)
-fig.autofmt_xdate()
-plt.ylabel('relativer Konsum [%]')
-set_title(plt, 'Durchschnittlicher Konsum nach Wochentag')
-plt.savefig('img/weekday.svg', transparent=True)
-plt.savefig(img_path+'/weekday.svg', transparent=True)
-plt.close()
+if sum(weekdays) != 0:
+    fig, ax = plt.subplots()
+    fig.set_size_inches(SIZE)
+    weekdays_title = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
+    ax.bar(weekdays_title, weekdays/sum(weekdays)*100, color=COLOR)
+    fig.autofmt_xdate()
+    plt.ylabel('relativer Konsum [%]')
+    set_title(plt, 'Durchschnittlicher Konsum nach Wochentag')
+    plt.savefig('img/weekday.svg', transparent=True)
+    plt.savefig(img_path+'/weekday.svg', transparent=True)
+    plt.close()
 
 
 #
 # BASED ON HOUR OF THE DAY
 #
-fig, ax = plt.subplots()
-fig.set_size_inches(SIZE)
-ax.bar(range(0,23+1), hours/sum(hours)*100, align='edge', color=COLOR)
-ax.set_xlim(0, 24)
-ax.set_xticks([1,2,4,5,7,8,10,12,14,16,17,19,20,22,23], minor=True)
-plt.xticks((0,3,6,9,12,15,18,21,24))
-plt.ylabel('relativer Konsum [%]')
-set_title(plt, 'Durchnittlicher Konsum nach Uhrzeit')
-plt.savefig(img_path+'/hour.svg', transparent=True)
-plt.close()
+if sum(hours) != 0:
+    fig, ax = plt.subplots()
+    fig.set_size_inches(SIZE)
+    ax.bar(range(0,23+1), hours/sum(hours)*100, align='edge', color=COLOR)
+    ax.set_xlim(0, 24)
+    ax.set_xticks([1,2,4,5,7,8,10,12,14,16,17,19,20,22,23], minor=True)
+    plt.xticks((0,3,6,9,12,15,18,21,24))
+    plt.ylabel('relativer Konsum [%]')
+    set_title(plt, 'Durchnittlicher Konsum nach Uhrzeit')
+    plt.savefig(img_path+'/hour.svg', transparent=True)
+    plt.close()
 
 
 #
