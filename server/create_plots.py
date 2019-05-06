@@ -16,6 +16,7 @@ import matplotlib.dates as mdates
 import mysql.connector
 from mysql.connector import errorcode
 
+# try to set up a german locale
 import locale
 for lang in ('de_DE', 'de_DE.utf8', 'de_CH', 'de_CH.utf8'):
     try:
@@ -24,8 +25,12 @@ for lang in ('de_DE', 'de_DE.utf8', 'de_CH', 'de_CH.utf8'):
     except Exception:
         pass
 
+# globals for plot formatting
+YEAR = datetime.now().year
+SIZE = (6, 4.5)
+COLOR = 'gray'
 
-
+# set up logging config
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s\t%(levelname)s\t[%(name)s: %(funcName)s]\t%(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
@@ -40,23 +45,22 @@ logtitle = 'main'
 logger = logging.getLogger(logtitle)
 logger.setLevel(loglevel)
 
+
+# start of script
 logger.info('started at '+time.strftime('%d.%m.%y, %H:%M'))
 
-
-
-
-
-
-
+# read config
 config = configparser.SafeConfigParser()
 config.read('settings.ini')
 
+# set up paths for the wordpress plugin and image directory
 plugin_path = str(config['general']['wordpress_plugin_dir'])
 img_path = plugin_path+"/img"
 if os.path.isdir(img_path) is False:
     logger.error('Image directory for wordpress plugin not found at '+img_path)
     sys.exit()
 
+# set up database connection
 try:
   dbcn = mysql.connector.connect(user=str(config['general']['mysql_user']), password=str(config['general']['mysql_password']), host='localhost', database='vcs_automat')
 except mysql.connector.Error as err:
@@ -68,40 +72,30 @@ except mysql.connector.Error as err:
         print(err)
     sys.exit()
 
+# read archive data from the database, each entry corresponds to one drink having been released
 db = dbcn.cursor()
 db.execute("SELECT unixtime FROM archive")
-
 raw_data = [unixtime for (unixtime,) in db]
-
 dbcn.close()
 
+# process and combine raw data into bins corresponding to hours, weekdays, weeks and years
+data = [{'hour': int(i.strftime('%H')), 'weekday': int(i.strftime('%w')), 'week': int(i.strftime('%W')), 'year': int(i.strftime('%Y'))} for i in map(datetime.fromtimestamp, raw_data)]
+hours = np.array([sum(entry.get('hour') == i for entry in data) for i in range(0,23+1)]) # all data is used
+weekdays = np.array([sum(entry.get('weekday') == i for entry in data) for i in range(0,6+1)]) # all data is used
+weeks = np.array([sum(entry.get('year') == YEAR and entry.get('week') == j for entry in data) for j in range(0,56+1)]) # only this year's data is used
 
-
-YEAR = datetime.now().year
-SIZE = (6, 4.5)
-COLOR = 'gray'
-
-
+# function to format the title
 def set_title(plt, text):
     plt.suptitle(text)
     plt.title('aktualisiert '+time.strftime('%d.%m.%y, %H:%M'), fontdict={'fontsize': 8}, color='gray')
 
-
-
-
+# define axis formatter for months
 months = mdates.MonthLocator()
 monthsFmt = mdates.DateFormatter('1. %b')
 
-data = [{'hour': int(i.strftime('%H')), 'weekday': int(i.strftime('%w')), 'week': int(i.strftime('%W')), 'year': int(i.strftime('%Y'))} for i in map(datetime.fromtimestamp, raw_data)]
-
-hours = np.array([sum(entry.get('hour') == i for entry in data) for i in range(0,23+1)])
-weekdays = np.array([sum(entry.get('weekday') == i for entry in data) for i in range(0,6+1)])
-weeks = np.array([sum(entry.get('year') == YEAR and entry.get('week') == j for entry in data) for j in range(0,56+1)])
-
-
 
 #
-# BASED ON WEEKDAYS
+# PLOT BASED ON WEEKDAYS
 #
 if sum(weekdays) != 0:
     fig, ax = plt.subplots()
@@ -117,7 +111,7 @@ if sum(weekdays) != 0:
 
 
 #
-# BASED ON HOUR OF THE DAY
+# PLOT BASED ON HOUR OF THE DAY
 #
 if sum(hours) != 0:
     fig, ax = plt.subplots()
@@ -133,13 +127,14 @@ if sum(hours) != 0:
 
 
 #
-# WEEKLY CONSUMPTION THIS YEAR
+# PLOT OF WEEKLY CONSUMPTION THIS YEAR
 #
 fig, ax = plt.subplots()
 fig.set_size_inches(SIZE)
-
 first_day = date(YEAR, 1, 1)
 last_day = date(YEAR, 12, 31)
+
+# figure out which date the monday of the first week of the current year falls on, so that the weeknumbers are correctly defined
 monday_of_week_zero = first_day - timedelta(days = first_day.weekday())
 weeknumber_start = 0 if first_day.weekday() > 0 else 1
 weeknumber_end = int(last_day.strftime('%W'))
@@ -147,11 +142,9 @@ weeknumber_end = int(last_day.strftime('%W'))
 x = range(int(mdates.date2num(monday_of_week_zero)), int(mdates.date2num(last_day))+1, 7)
 y = weeks[weeknumber_start:weeknumber_end+1]
 ax.bar(x, y, width=6, align='edge', color=COLOR)
-
 ax.xaxis.set_major_locator(mdates.MonthLocator())
 ax.xaxis.set_major_formatter(mdates.DateFormatter('1. %b'))
 fig.autofmt_xdate()
-
 ax.set_xlim(int(mdates.date2num(datetime(YEAR, 1, 1))), int(mdates.date2num(datetime(YEAR, 12, 31))))
 plt.ylabel('Gesamtkonsum')
 set_title(plt, 'Wöchentlicher Konsum in '+str(YEAR))
