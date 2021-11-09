@@ -101,7 +101,9 @@ if sum(weekdays) != 0:
     fig, ax = plt.subplots()
     fig.set_size_inches(SIZE)
     weekdays_title = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
-    ax.bar(weekdays_title, weekdays/sum(weekdays)*100, color=COLOR)
+    weekdays_index = range(len(weekdays_title))
+    ax.bar(weekdays_index, weekdays/sum(weekdays)*100, color=COLOR)
+    plt.xticks(weekdays_index, weekdays_title)
     fig.autofmt_xdate()
     plt.ylabel('relativer Konsum [%]')
     set_title(plt, 'Durchschnittlicher Konsum nach Wochentag')
